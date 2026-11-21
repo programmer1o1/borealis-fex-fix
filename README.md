@@ -12,6 +12,18 @@ The installer requires Apple Silicon, macOS 26 or later, and a writable CrossOve
 
 The change applies to Wine’s ARM64 Vulkan path in the selected runtimes. Native macOS apps, Rosetta bottles, and D3DMetal keep their existing graphics paths.
 
+## Optional Vulkan emulation on M4
+
+The bundled MacLauncher driver already implements software paths for some features that newer Apple GPUs provide in hardware. It also emulates 64-bit buffer and image atomics used by Borealis. Leave the driver defaults in place for regular play and opt in to a specific feature when a game needs it.
+
+For a NotProton FEX game that requires Vulkan depth bounds testing, put this in its Steam launch options. Place any existing game arguments after `%command%`.
+
+```text
+KK_EMULATION=performance,+depth_bounds %command%
+```
+
+Depth bounds uses a native Metal path on M5 and a software implementation on M4. The pinned build also accepts `KK_EMULATION=performance,+ray_tracing` to expose acceleration structures, ray queries, and ray tracing pipelines through compute emulation. These options were verified by querying Vulkan capabilities on an M4. Game compatibility and speed depend on the workload. See the [MacLauncher emulation reference](https://github.com/procrastinine/maclauncher/blob/master/docs/runtimes/KOSMICKRISP.md#performance-and-conformance) for how each option works.
+
 ## Restore MoltenVK
 
 Run `bash /path/to/install.command --restore` from the extracted release. Add `--crossover` or `--notproton` to restore one runtime. The installer restores the verified original library and keeps the downloaded driver and backup for reinstallation.
