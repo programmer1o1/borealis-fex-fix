@@ -58,7 +58,7 @@ if [[ "$restore" -eq 0 ]]; then
     [[ "${macos_version%%.*}" -ge 26 ]] || fail 'The bundled driver requires macOS 26 or later.'
 fi
 
-work="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/borealis-fex.XXXXXXXX")"
+work="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/kosmickrisp-fex.XXXXXXXX")"
 staging=''
 cleanup() {
     if [[ -n "$staging" ]]; then
@@ -125,7 +125,7 @@ for runtime in "${targets[@]}"; do
         printf 'MoltenVK is already active in %s\n' "$runtime"
         continue
     fi
-    staging="$(/usr/bin/mktemp -d "$lib/.borealis-fex.XXXXXXXX")"
+    staging="$(/usr/bin/mktemp -d "$lib/.kosmickrisp-fex.XXXXXXXX")"
     if [[ "$restore" -eq 1 ]]; then
         /bin/cp -p "$backup" "$staging/library"
         /bin/mv -f "$staging/library" "$live"
@@ -149,4 +149,4 @@ for runtime in "${targets[@]}"; do
     staging=''
 done
 
-printf '%s\n' 'Relaunch games after changing the driver. For Project Borealis, use Steam launch options -vulkan -DP=Windows_Performance.'
+printf '%s\n' 'Relaunch games in the updated runtime to use the selected Vulkan driver.'

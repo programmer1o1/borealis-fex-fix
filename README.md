@@ -1,32 +1,36 @@
-# Project Borealis FEX fix
+# KosmicKrisp installer for CrossOver Preview and NotProton FEX
 
-Use MacLauncher’s KosmicKrisp as the default Vulkan driver for CrossOver Preview and NotProton FEX, then run Project Borealis Prologue with its performance device profile.
+Make MacLauncher’s KosmicKrisp the default Vulkan driver for Windows games running in the supported ARM64 Wine runtimes. This applies to games that use Vulkan directly and to Vulkan-based translation layers such as DXVK and VKD3D-Proton. Compatibility varies by game and translation-layer version.
 
 ## Quick install
 
-1. Download and extract the [installer ZIP](https://github.com/programmer1o1/borealis-fex-fix/releases/latest/download/Borealis-FEX-Fix.zip).
-2. Close the Windows games using the runner. Open Terminal, type `bash ` with a trailing space, drag the extracted `install.command` into the Terminal window, and press Return.
-3. Set Project Borealis Prologue’s Steam launch options to:
+1. Download and extract the [installer ZIP](https://github.com/programmer1o1/borealis-fex-fix/releases/latest/download/KosmicKrisp-FEX-Installer.zip).
+2. Close the Windows games using the runner. Open Terminal, type `bash ` with a trailing space, drag the extracted `install.command` into Terminal, and press Return.
+3. Relaunch your game in the CrossOver ARM64 bottle or with the NotProton FEX compatibility tool. Use the game’s usual launch options.
 
-   ```text
-   -vulkan -DP=Windows_Performance
-   ```
+The installer requires Apple Silicon, macOS 26 or later, and a writable CrossOver Preview build 27.0.0.41073 or its matching NotProton FEX runner. It verifies the original ARM64 MoltenVK library by hash. Set up the FEX runner in NotProton first so its local copy exists. The installer selects both supported locations it finds. Use `--crossover` or `--notproton` to select one. A CrossOver update or NotProton runner reimport can replace the change.
 
-4. Launch using the CrossOver ARM64 bottle or NotProton FEX compatibility tool. Leave Steam running while playing.
-
-The installer requires Apple Silicon, macOS 26 or later, and a writable CrossOver Preview build 27.0.0.41073 or its matching NotProton FEX runner. It verifies the original ARM64 MoltenVK library by hash. Open or configure the runner in NotProton first so its local copy exists. The installer selects both matching locations by default. Run `bash /path/to/install.command --crossover` or `bash /path/to/install.command --notproton` to select one. An update or runner reimport can replace the change.
+The change applies to Wine’s ARM64 Vulkan path in the selected runtimes. Native macOS apps, Rosetta bottles, and D3DMetal keep their existing graphics paths.
 
 ## Restore MoltenVK
 
-Run `bash /path/to/install.command --restore` from the extracted release. Add `--crossover` or `--notproton` to restore one runtime. This restores the original library from the verified backup. The downloaded driver files and backup stay alongside it for reinstallation.
+Run `bash /path/to/install.command --restore` from the extracted release. Add `--crossover` or `--notproton` to restore one runtime. The installer restores the verified original library and keeps the downloaded driver and backup for reinstallation.
 
-## What changes
+## Tested example — Project Borealis Prologue
 
-The ARM64 library loaded by Wine for Vulkan becomes a small shim that forwards Vulkan calls to the Khronos loader and supplies the bundled KosmicKrisp manifest by default. Explicit `VK_DRIVER_FILES` or `VK_ICD_FILENAMES` overrides still work. The installer downloads the pinned [MacLauncher 27.0.0-devel-MCLv15 ARM64 archive](https://github.com/procrastinine/maclauncher-builds/releases/tag/maclauncher-kosmickrisp/v27.0.0-devel-MCLv15/arm64) and checks its SHA-256 before unpacking it. The release contains the installer and shim. The vendor runtimes and game files stay on your machine.
+Borealis uses Unreal’s native Vulkan renderer with these Steam launch options.
 
-On Apple M4, this driver lets the game pass the Vulkan SM6 checks. The performance profile disables features including Nanite tessellation and Virtual Shadow Maps. The default profile triggered a Metal command queue timeout during the Ravenholm load on the tested M4. The performance profile reached gameplay in both CrossOver and NotProton. The exact render pass that timed out is unknown.
+```text
+-vulkan -DP=Windows_Performance
+```
 
-The shim source is in `loader-default.c`. To build it, extract the upstream archive and run this command from the repository, substituting the path to its loader:
+On the tested Apple M4, MacLauncher’s KosmicKrisp passed the game’s Vulkan SM6 checks. The default graphics profile then triggered a Metal command queue timeout while loading Ravenholm. The performance profile disables features including Nanite tessellation and Virtual Shadow Maps and reached gameplay in both CrossOver and NotProton. Use those flags for Borealis and leave Steam open while playing.
+
+## How it works
+
+Wine loads a small ARM64 shim that forwards Vulkan calls to the Khronos loader and supplies a KosmicKrisp manifest. Explicit `VK_DRIVER_FILES` or `VK_ICD_FILENAMES` overrides still work. The installer downloads the pinned [MacLauncher 27.0.0-devel-MCLv15 ARM64 archive](https://github.com/procrastinine/maclauncher-builds/releases/tag/maclauncher-kosmickrisp/v27.0.0-devel-MCLv15/arm64) and checks its SHA-256 before unpacking it. The release contains the installer and shim.
+
+To build the shim, extract the upstream archive and run this command from the repository with the path to its loader.
 
 ```sh
 clang -arch arm64 -dynamiclib -mmacosx-version-min=26.0 loader-default.c \
