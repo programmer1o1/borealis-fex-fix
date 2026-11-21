@@ -28,7 +28,9 @@ Depth bounds uses a native Metal path on M5 and a software implementation on M4.
 
 Run `bash /path/to/install.command --restore` from the extracted release. Add `--crossover` or `--notproton` to restore one runtime. The installer restores the verified original library and keeps the downloaded driver and backup for reinstallation.
 
-## Tested example — Project Borealis Prologue
+## Tested games on Apple M4
+
+### Project Borealis Prologue
 
 Borealis uses Unreal’s native Vulkan renderer with these Steam launch options.
 
@@ -37,6 +39,10 @@ Borealis uses Unreal’s native Vulkan renderer with these Steam launch options.
 ```
 
 On the tested Apple M4, MacLauncher’s KosmicKrisp passed the game’s Vulkan SM6 checks. The default graphics profile then triggered a Metal command queue timeout while loading Ravenholm. The performance profile disables features including Nanite tessellation and Virtual Shadow Maps and reached gameplay in both CrossOver and NotProton. Use those flags for Borealis and leave Steam open while playing.
+
+### Black Mesa
+
+Black Mesa ran with NotProton FEX build 27.0.0.41073, graphics set to **Automatic**, and DXVK handling Direct3D 9. The run log identifies the patched FEX runner and records a clean exit after about 53 minutes. KosmicKrisp was configured as the runner’s Vulkan default. The session log did not record the active Vulkan driver name.
 
 ## How it works
 
